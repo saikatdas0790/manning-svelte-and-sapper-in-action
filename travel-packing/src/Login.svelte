@@ -2,8 +2,8 @@
   let password = "";
   let username = "";
 
-  const login = () => console.log("You pressed Login");
-  const signup = () => console.log("You pressed Signup");
+  const login = () => alert("You pressed Login");
+  const signup = () => alert("You pressed Signup");
 </script>
 
 <style>
