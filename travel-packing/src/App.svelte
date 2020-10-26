@@ -1,30 +1,32 @@
 <script lang="ts">
-	export let name: string;
+  import Login from "./Login.svelte";
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
-
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+  .hero {
+    --height: 7rem;
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
+    background-color: orange;
+    color: white;
+    font-size: 4rem;
+    height: var(--height);
+    line-height: var(--height);
+    margin: 0 0 3rem 0;
+    text-align: center;
+    vertical-align: middle;
+    width: 100vw;
+  }
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+  main {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
 </style>
+
+<main>
+  <h1 class="hero">Travel Packing Checklist</h1>
+  <Login />
+</main>
