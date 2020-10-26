@@ -1,6 +1,6 @@
-import App from "./App.svelte";
+import TodoList from "./TodoList.svelte";
 
-const app = new App({
+const app = new TodoList({
   target: document.body,
 });
 
