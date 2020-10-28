@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Login from "./Login.svelte";
+  import Checklist from "./Checklist.svelte";
+  // import Login from "./Login.svelte";
 </script>
 
 <style>
   .hero {
     --height: 7rem;
-
     background-color: orange;
     color: white;
     font-size: 4rem;
@@ -16,7 +16,6 @@
     vertical-align: middle;
     width: 100vw;
   }
-
   main {
     color: white;
     display: flex;
@@ -28,5 +27,6 @@
 
 <main>
   <h1 class="hero">Travel Packing Checklist</h1>
-  <Login />
+  <!-- <Login /> -->
+  <Checklist />
 </main>
