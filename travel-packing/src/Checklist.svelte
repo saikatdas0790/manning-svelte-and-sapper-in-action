@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import Category from "./Category.svelte";
   import { getGuid, sortOnName } from "./util";
-  import type { Category as CategoryType } from "./Types";
+  import type { Category as CategoryType, ShowValues } from "./Types";
+
+  const dispatch = createEventDispatcher();
 
   let categoryArray: CategoryType[] = [];
   let categories: {
@@ -9,7 +12,7 @@
   } = {};
   let categoryName: string;
   let message = "";
-  let show = "all";
+  let show: ShowValues = "all";
 
   $: categoryArray = sortOnName(Object.values(categories));
 
@@ -35,6 +38,19 @@
       }
     }
     categories = categories;
+  }
+
+  restore();
+
+  $: if (categories) persist();
+
+  function persist(): void {
+    localStorage.setItem("travel-packing", JSON.stringify(categories));
+  }
+
+  function restore(): void {
+    const text = localStorage.getItem("travel-packing");
+    if (text && text !== "{}") categories = JSON.parse(text);
   }
 </script>
 
@@ -80,7 +96,7 @@
     <form on:submit|preventDefault={addCategory}>
       <label> New Category <input required bind:value={categoryName} /> </label>
       <button>Add Category</button>
-      <button class="logout-btn">Log Out</button>
+      <button class="logout-btn" on:click={() => dispatch('logout')}>Log Out</button>
     </form>
     <p>
       Suggested categories include Backpack, Clothes,
@@ -109,7 +125,7 @@
 
   <div class="categories">
     {#each categoryArray as category (category.id)}
-      <Category bind:category {categories} {show} />
+      <Category bind:category {categories} {show} on:persist={persist} />
     {/each}
   </div>
 </section>

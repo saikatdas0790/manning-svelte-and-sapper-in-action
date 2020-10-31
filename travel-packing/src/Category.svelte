@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import Item from "./Item.svelte";
   import { getGuid, blurOnKey, sortOnName } from "./util";
   import type {
@@ -6,6 +7,8 @@
     Item as ItemType,
     ShowValues,
   } from "./Types";
+
+  const dispatch = createEventDispatcher();
 
   export let categories: {
     [key: string]: CategoryType;
@@ -39,6 +42,13 @@
     category.items = items;
     itemName = "";
   }
+
+  const deleteItem = (item: ItemType): void => {
+    delete category.items[item.id];
+    category = category;
+  };
+
+  dispatch("persist");
 
   function shouldShow(show: ShowValues, item: ItemType) {
     return (
@@ -108,7 +118,7 @@
     {#each itemsToShow as item (item.id)}
       <!-- This bind causes the category object to update
         when the item packed value is toggled. -->
-      <Item bind:item />
+      <Item bind:item on:delete={() => deleteItem(item)} />
     {:else}
       <div>This category does not contain any items yet.</div>
     {/each}

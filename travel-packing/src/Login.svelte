@@ -1,8 +1,12 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+
   let password = "";
   let username = "";
 
-  const login = (): void => {};
+  const login = (): void => dispatch("login");
   const signup = (): void => {};
 </script>
 

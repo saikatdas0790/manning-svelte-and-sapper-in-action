@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import type { Item } from "./Types";
   import { blurOnKey } from "./util";
+
+  const dispatch = createEventDispatcher();
 
   export let item: Item;
   let editing = false;
@@ -47,5 +50,5 @@
       {item.name}
     </span>
   {/if}
-  <button class="icon">&#x1F5D1;</button>
+  <button class="icon" on:click={() => dispatch('delete')}>&#x1F5D1;</button>
 </li>
