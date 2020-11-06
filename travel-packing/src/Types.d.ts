@@ -13,3 +13,8 @@ export interface Category {
 }
 
 export type ShowValues = "all" | "packed" | "unpacked";
+
+export interface DragAndDrop {
+  drag: (event: DragEvent, categoryId: string, itemId: string) => void;
+  drop: (event: DragEvent, categoryId: string) => void;
+}

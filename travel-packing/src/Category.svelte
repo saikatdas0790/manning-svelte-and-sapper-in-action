@@ -1,9 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import Item from "./Item.svelte";
+  import Dialog from "./Dialog.svelte";
   import { getGuid, blurOnKey, sortOnName } from "./util";
   import type {
     Category as CategoryType,
+    DragAndDrop,
     Item as ItemType,
     ShowValues,
   } from "./Types";
@@ -15,11 +17,14 @@
   };
   export let category: CategoryType;
   export let show: ShowValues;
+  export let dnd: DragAndDrop;
 
   let editing = false;
   let itemName = "";
   let items: ItemType[] = [];
   let message = "";
+  let dialog: HTMLDialogElement = null;
+  let hovering = false;
 
   $: items = Object.values(category.items);
   $: remaining = items.filter((item) => !item.packed).length;
@@ -33,7 +38,7 @@
     );
     if (duplicate) {
       message = `The item "${itemName}" already exists.`;
-      alert(message); // will be replaced by a dialog later
+      dialog.showModal();
       return;
     }
     const { items } = category;
@@ -95,9 +100,23 @@
     margin: 0;
     padding-left: 0;
   }
+  .hover {
+    border-color: orange;
+  }
 </style>
 
-<section>
+<section
+  class:hover={hovering}
+  on:dragenter={() => (hovering = true)}
+  on:dragleave={(event) => {
+    const localName = event.target.localName;
+    if (localName === 'section') hovering = false;
+  }}
+  on:drop|preventDefault={(event) => {
+    dnd.drop(event, category.id);
+    hovering = false;
+  }}
+  on:dragover|preventDefault>
   <h3>
     {#if editing}
       <input
@@ -118,9 +137,17 @@
     {#each itemsToShow as item (item.id)}
       <!-- This bind causes the category object to update
         when the item packed value is toggled. -->
-      <Item bind:item on:delete={() => deleteItem(item)} />
+      <Item
+        bind:item
+        on:delete={() => deleteItem(item)}
+        categoryId={category.id}
+        {dnd} />
     {:else}
       <div>This category does not contain any items yet.</div>
     {/each}
   </ul>
 </section>
+
+<Dialog title="Category" bind:dialog>
+  <div>{message}</div>
+</Dialog>

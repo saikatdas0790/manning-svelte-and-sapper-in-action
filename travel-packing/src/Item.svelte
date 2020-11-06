@@ -1,11 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { Item } from "./Types";
+  import type { DragAndDrop, Item } from "./Types";
   import { blurOnKey } from "./util";
 
   const dispatch = createEventDispatcher();
 
   export let item: Item;
+  export let categoryId: string;
+  export let dnd: DragAndDrop;
   let editing = false;
 </script>
 
@@ -46,7 +48,11 @@
       on:keydown={blurOnKey}
       type="text" />
   {:else}
-    <span class="packed-{item.packed}" on:click={() => (editing = true)}>
+    <span
+      draggable="true"
+      on:dragstart={(event) => dnd.drag(event, categoryId, item.id)}
+      class="packed-{item.packed}"
+      on:click={() => (editing = true)}>
       {item.name}
     </span>
   {/if}

@@ -1,8 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import Category from "./Category.svelte";
+  import Dialog from "./Dialog.svelte";
   import { getGuid, sortOnName } from "./util";
-  import type { Category as CategoryType, ShowValues } from "./Types";
+  import type {
+    Category as CategoryType,
+    DragAndDrop,
+    ShowValues,
+  } from "./Types";
 
   const dispatch = createEventDispatcher();
 
@@ -13,8 +18,28 @@
   let categoryName: string;
   let message = "";
   let show: ShowValues = "all";
+  let dialog: HTMLDialogElement = null;
 
   $: categoryArray = sortOnName(Object.values(categories));
+
+  let dragAndDrop: DragAndDrop = {
+    drag(event: DragEvent, categoryId: string, itemId: string) {
+      const data = { categoryId, itemId };
+      event.dataTransfer.setData("text/plain", JSON.stringify(data));
+    },
+    drop(event: DragEvent, categoryId: string) {
+      const json = event.dataTransfer.getData("text/plain");
+      const data: { categoryId: string; itemId: string } = JSON.parse(json);
+
+      const category = categories[data.categoryId];
+      const item = category.items[data.itemId];
+      delete category.items[data.itemId];
+
+      categories[categoryId].items[data.itemId] = item;
+
+      categories = categories;
+    },
+  };
 
   function addCategory(): void {
     const duplicate = Object.values(categories).some(
@@ -22,7 +47,7 @@
     );
     if (duplicate) {
       message = `The category "${categoryName}" already exists.`;
-      alert(message); // will change to a dialog later
+      dialog.showModal();
       return;
     }
     const id = getGuid();
@@ -37,6 +62,17 @@
         item.packed = false;
       }
     }
+    categories = categories;
+  }
+
+  function deleteCategory(category: CategoryType) {
+    if (Object.values(category.items).length) {
+      message = "This category is not empty.";
+      dialog.showModal();
+      return;
+    }
+
+    delete categories[category.id];
     categories = categories;
   }
 
@@ -96,7 +132,9 @@
     <form on:submit|preventDefault={addCategory}>
       <label> New Category <input required bind:value={categoryName} /> </label>
       <button>Add Category</button>
-      <button class="logout-btn" on:click={() => dispatch('logout')}>Log Out</button>
+      <button class="logout-btn" on:click={() => dispatch('logout')}>
+        Log Out
+      </button>
     </form>
     <p>
       Suggested categories include Backpack, Clothes,
@@ -125,7 +163,16 @@
 
   <div class="categories">
     {#each categoryArray as category (category.id)}
-      <Category bind:category {categories} {show} on:persist={persist} />
+      <Category
+        bind:category
+        {categories}
+        dnd={dragAndDrop}
+        {show}
+        on:delete={() => deleteCategory(category)}
+        on:persist={persist} />
     {/each}
   </div>
 </section>
+<Dialog title="Checklist" bind:dialog>
+  <div>{message}</div>
+</Dialog>
